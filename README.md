@@ -22,6 +22,17 @@ distinguish genuine signal from small-sample noise.
 (PhysioNet) — 100 patients, 129 admissions, 136 ICU stays. Publicly
 available with no credentialing required. Loaded into SQLite for querying.
 
+## Repository structure
+clinical-data-sql-analysis/
+├── notebooks/
+│   └── P2_sql_analysis.ipynb    # Full SQL + Python analysis pipeline
+├── results/
+│   ├── los_by_diagnosis.png
+│   ├── los_by_insurance.png
+│   ├── age_vs_los.png
+│   └── los_regression_coefficients.png
+└── README.md
+
 ## Methods
 
 - **Database:** 25 MIMIC-III tables loaded into SQLite via Python/pandas
@@ -39,17 +50,25 @@ available with no credentialing required. Loaded into SQLite for querying.
 ### 1. LOS by primary diagnosis (directional, small samples)
 Liver conditions (acute necrosis, hepatic encephalopathy, cirrhosis) and
 heart failure show the longest average stays; infections and kidney/urinary
-issues the shortest. Most diagnosis categories have only 2–6 admissions,
+issues the shortest. Notably, most diagnosis categories have only 2–6 admissions,
 so these patterns are clinically plausible but not statistically robust
 individually — read as directional, not definitive.
 
 ### 2. LOS by insurance type (confounded, not causal)
 Medicaid admissions show the longest average stay (8.4 days), followed by
 Private (5.9) and Medicare (3.9). This should not be read as insurance
-*causing* longer stays, but rather it more likely reflects underlying differences
+causing longer stays, but rather it more likely reflects underlying differences
 in health status and access to care prior to admission.
 
-### 3. What actually predicts LOS: a multiple regression (n=127)
+### 3. Age vs. LOS (weak, on its own)
+Across the cleaned sample (n=127), age shows a weak negative correlation with 
+LOS on its own (r = -0.29, r² ≈ 0.08). Older patients (65+) cluster toward shorter, 
+more consistent stays, while younger and middle-aged patients show much greater 
+variability — including most of the dataset's longest outlier stays. Age 
+alone explains only a small share of the variance, which is why it's tested 
+alongside other predictors in the regression below.
+
+### 4. What actually predicts LOS: a multiple regression (n=127)
 A regression combining age, diagnosis count, procedure count, medication
 count, care unit, and admission type explains over half the variation in
 LOS (**R² = 0.54, p < 0.001**).
@@ -59,7 +78,7 @@ the strongest predictors** — patients who underwent more procedures and
 received more distinct medications had meaningfully longer stays. Age was
 a significant but weaker predictor (p=0.041). Diagnosis count, care unit,
 and admission type showed no independent effect once treatment intensity
-was accounted for — diagnosis count's earlier apparent effect turned out
+was accounted for. Diagnosis count's earlier apparent effect turned out
 to be a proxy for treatment intensity, not diagnosis type itself.
 
 **Conclusion:** how intensively a patient is treated — not which
