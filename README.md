@@ -23,6 +23,8 @@ distinguish genuine signal from small-sample noise.
 available with no credentialing required. Loaded into SQLite for querying.
 
 ## Repository structure
+
+```
 clinical-data-sql-analysis/
 ├── notebooks/
 │   └── P2_sql_analysis.ipynb    # Full SQL + Python analysis pipeline
@@ -32,6 +34,7 @@ clinical-data-sql-analysis/
 │   ├── age_vs_los.png
 │   └── los_regression_coefficients.png
 └── README.md
+```
 
 ## Methods
 
